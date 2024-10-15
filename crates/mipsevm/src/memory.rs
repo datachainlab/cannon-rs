@@ -368,7 +368,7 @@ impl Memory {
 #[derive(Serialize, Deserialize, Debug)]
 struct PageEntry {
     index: PageIndex,
-    #[serde(with = "crate::ser::page_hex")]
+    #[serde(with = "crate::ser::page_base64")]
     data: Page,
 }
 
