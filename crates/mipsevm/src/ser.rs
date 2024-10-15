@@ -1,9 +1,9 @@
 //! Serialization utilities for the `cannon-mipsevm` crate.
 
-use std::io::{Error, Read, Write};
-use flate2::Compression;
 use flate2::read::ZlibDecoder;
 use flate2::write::ZlibEncoder;
+use flate2::Compression;
+use std::io::{Error, Read, Write};
 
 /// Generates a hex string serialization module for a fixed-size byte array.
 macro_rules! fixed_hex_ser {
@@ -63,9 +63,9 @@ pub mod vec_u8_hex {
 macro_rules! fixed_base64_ser {
     ($module_name:ident, $size:expr) => {
         pub mod $module_name {
-            use serde::{self, Deserialize, Deserializer, Serializer};
             use base64::prelude::BASE64_STANDARD;
             use base64::Engine;
+            use serde::{self, Deserialize, Deserializer, Serializer};
 
             use crate::ser::{compress_bytes, decompress_bytes};
 
@@ -73,9 +73,10 @@ macro_rules! fixed_base64_ser {
             where
                 S: Serializer,
             {
-                 let encoded = BASE64_STANDARD.encode(bytes);
-                 let encoded = compress_bytes(encoded.as_bytes()).map_err(serde::ser::Error::custom)?;
-                 serializer.serialize_bytes(&encoded)
+                let encoded = BASE64_STANDARD.encode(bytes);
+                let encoded =
+                    compress_bytes(encoded.as_bytes()).map_err(serde::ser::Error::custom)?;
+                serializer.serialize_bytes(&encoded)
             }
 
             pub fn deserialize<'de, D>(deserializer: D) -> Result<[u8; $size], D::Error>
@@ -83,7 +84,9 @@ macro_rules! fixed_base64_ser {
                 D: Deserializer<'de>,
             {
                 let s = String::deserialize(deserializer)?;
-                let decoded = BASE64_STANDARD.decode(s).map_err(serde::de::Error::custom)?;
+                let decoded = BASE64_STANDARD
+                    .decode(s)
+                    .map_err(serde::de::Error::custom)?;
                 decompress_bytes(&decoded)
                     .map_err(serde::de::Error::custom)
                     .map(|bytes| {
@@ -111,5 +114,5 @@ pub fn decompress_bytes(compressed_bytes: &[u8]) -> Result<Vec<u8>, Error> {
 pub fn compress_bytes(decompressed_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
     encoder.write_all(decompressed_bytes)?;
-    Ok(encoder.finish()?)
+    encoder.finish()
 }

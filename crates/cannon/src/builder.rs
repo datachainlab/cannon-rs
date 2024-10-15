@@ -49,7 +49,7 @@ impl KernelBuilder {
         let raw_state = fs::read(&self.input)?;
         let raw_state = if self.input.ends_with("gz") {
             gz::decompress_bytes(&raw_state)?
-        }else {
+        } else {
             raw_state
         };
         let state: State = serde_json::from_slice(&raw_state)?;
