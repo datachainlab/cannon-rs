@@ -47,7 +47,12 @@ impl KernelBuilder {
         let mut raw_state = Vec::with_capacity(f_sz as usize);
         reader.read_to_end(&mut raw_state)?;
         let raw_state = fs::read(&self.input)?;
-        let state: State = serde_json::from_slice(&gz::decompress_bytes(&raw_state)?)?;
+        let raw_state = if self.input.ends_with("gz") {
+            gz::decompress_bytes(&raw_state)?
+        } else {
+            raw_state
+        };
+        let state: State = serde_json::from_slice(&raw_state)?;
 
         let (hint_cl_rw, hint_oracle_rw) = preimage_oracle::create_bidirectional_channel()?;
         let (pre_cl_rw, pre_oracle_rw) = preimage_oracle::create_bidirectional_channel()?;

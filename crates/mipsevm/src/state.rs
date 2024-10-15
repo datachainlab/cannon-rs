@@ -21,6 +21,7 @@ pub struct State {
     /// The current program counter.
     pub pc: u32,
     /// The next program counter.
+    #[serde(rename = "nextPC")]
     pub next_pc: u32,
     /// The lo register
     pub lo: u32,
@@ -29,6 +30,7 @@ pub struct State {
     /// The heap pointer
     pub heap: u32,
     /// The exit code of the MIPS emulator.
+    #[serde(rename = "exit")]
     pub exit_code: u8,
     /// The exited status of the MIPS emulator.
     pub exited: bool,
@@ -38,6 +40,7 @@ pub struct State {
     pub registers: [u32; 32],
     /// The last hint sent to the host.
     #[serde(with = "crate::ser::vec_u8_hex")]
+    #[serde(default)]
     pub last_hint: Vec<u8>,
 }
 
