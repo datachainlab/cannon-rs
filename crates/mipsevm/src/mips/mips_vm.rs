@@ -350,7 +350,17 @@ where
                     }
                 },
                 Syscall::Fcntl => {
-                    if a1 == 3 {
+                    if a1 == 1 { // F_GETFD: get file descriptor flags
+                        match (a0 as u8).try_into() {
+                            Ok(Fd::StdIn | Fd::Stdout | Fd::StdErr | Fd::PreimageRead | Fd::HintRead | Fd::PreimageWrite | Fd::HintWrite) => {
+                                v0 = 0 // No flags set
+                            }
+                            _ => {
+                                v0 = 0xFFFFFFFF;
+                                v1 = MIPS_EBADF
+                            }
+                        }
+                    } else if a1 == 3 {
                         match (a0 as u8).try_into() {
                             Ok(Fd::StdIn | Fd::PreimageRead | Fd::HintRead) => {
                                 v0 = 0; // O_RDONLY
